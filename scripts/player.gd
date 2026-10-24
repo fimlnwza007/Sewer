@@ -3,37 +3,76 @@ extends CharacterBody3D
 @export var SPEED = 5.0
 @export var JUMP_VELOCITY = 4.5
 @export var MOUSE_SENSITIVITY = 0.002
+@export var TOUCH_SENSITIVITY = 0.006
 
 @onready var head: Node3D = $head
-@onready var camera: Camera3D = $head/Camera3D
 
+## Multi-touch look tracking
+var _look_index: int   = -1
+var _look_last:  Vector2 = Vector2.ZERO
+var _look_accum: Vector2 = Vector2.ZERO   # สะสม delta ระหว่างเฟรม
+
+## ===================== Ready =====================
 func _ready() -> void:
-	pass  # ไม่ lock เมาส์ — ให้ LookZone จัดการหันหน้าทั้งบนมือถือและ PC (emulate_touch_from_mouse)
+	# PC only: lock mouse
+	if OS.get_name() not in ["Android", "iOS"]:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
+## ===================== Input =====================
 func _input(event: InputEvent) -> void:
-	# Esc สลับ mouse capture บน PC (สำหรับผู้ที่ต้องการ)
+	# ESC toggle mouse lock (PC)
 	if event.is_action_pressed("ui_cancel"):
-		if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		else:
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		Input.mouse_mode = (
+			Input.MOUSE_MODE_VISIBLE
+			if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+			else Input.MOUSE_MODE_CAPTURED
+		)
 
-func _unhandled_input(event: InputEvent) -> void:
-	# หันหน้าด้วยเมาส์ (PC) — ใช้เมื่อ mouse ถูก capture เท่านั้น
-	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		_apply_look(event.relative)
+	# PC mouse look
+	elif event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		_look_accum += event.relative
+		return
 
-## เรียกจาก LookZone เพื่อหันหน้าบนมือถือ
+	# ===== Touch look (right half of screen) =====
+	elif event is InputEventScreenTouch:
+		var vp_w: float = get_viewport().get_visible_rect().size.x
+		if event.pressed and _look_index == -1 and event.position.x >= vp_w * 0.45:
+			_look_index = event.index
+			_look_last  = event.position
+			_look_accum = Vector2.ZERO
+			get_viewport().set_input_as_handled()
+		elif not event.pressed and event.index == _look_index:
+			_look_index = -1
+			get_viewport().set_input_as_handled()
+
+	elif event is InputEventScreenDrag and event.index == _look_index:
+		# คำนวณ delta จาก position จริง (ไม่ใช้ event.relative ที่มีบั๊ก multi-touch)
+		var raw: Vector2 = event.position - _look_last
+		_look_last = event.position
+		# Spike guard: ตัดค่ากระโดดผิดปกติตอนวางนิ้วที่ 2
+		if raw.length() <= 80.0:
+			_look_accum += raw
+		get_viewport().set_input_as_handled()
+
+## ===================== Process =====================
+func _process(_delta: float) -> void:
+	if _look_accum != Vector2.ZERO:
+		_apply_look(_look_accum)
+		_look_accum = Vector2.ZERO
+
+## เรียกได้จาก script อื่นถ้าจำเป็น
 func apply_look_delta(delta: Vector2) -> void:
 	_apply_look(delta)
 
 func _apply_look(delta: Vector2) -> void:
-	rotate_y(-delta.x * MOUSE_SENSITIVITY)
-	head.rotate_x(-delta.y * MOUSE_SENSITIVITY)
+	var sens: float = TOUCH_SENSITIVITY if _look_index != -1 else MOUSE_SENSITIVITY
+	rotate_y(-delta.x * sens)
+	head.rotate_x(-delta.y * sens)
 	head.rotation.x = clamp(head.rotation.x, deg_to_rad(-89), deg_to_rad(89))
 
+## ===================== Physics =====================
 func _physics_process(delta: float) -> void:
-	# แรงโน้มถ่วง
+	# Gravity
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 
@@ -41,7 +80,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
-	# รับ input จาก action "a", "d", "w", "s" (มาจากทั้งปุ่มคีย์บอร์ดและจอยสติ๊ก)
+	# Movement: จากจอยสติ๊ก (action a/d/w/s) หรือ WASD
 	var input_dir := Input.get_vector("a", "d", "w", "s")
 	if input_dir == Vector2.ZERO:
 		input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
