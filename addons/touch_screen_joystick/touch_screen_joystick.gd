@@ -176,17 +176,6 @@ func _input(event: InputEvent) -> void:
 		on_screen_touch(event)
 	elif event is InputEventScreenDrag:
 		on_screen_drag(event)
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed and event_index == -1 and _is_inside_joystick(event.position):
-			event_index = 9999
-			touch_knob(event.position, 9999)
-		elif not event.pressed and event_index == 9999:
-			release_knob(9999)
-	elif event is InputEventMouseMotion:
-		if event_index == 9999 and is_pressing:
-			move_knob(event.position)
-			get_viewport().set_input_as_handled()
-			on_drag.emit(get_factor())
 
 ## Called when the joystick is touched
 func on_screen_touch(event : InputEventScreenTouch) -> void:
