@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://models/SM_Motel_BeerBottle.glb" id="1_n4w22"]
+[ext_resource type="PackedScene" path="res://models/SM_Motel_CardboardBox.glb" id="2_884kg"]
+[ext_resource type="PackedScene" path="res://models/SM_Motel_CrushedCan.glb" id="3_d4o4o"]
+[ext_resource type="PackedScene" path="res://models/SM_Motel_Newspaper.glb" id="4_gdsc3"]
+[ext_resource type="PackedScene" path="res://models/SM_Motel_PizzaBox.glb" id="5_svejp"]
+[ext_resource type="PackedScene" path="res://models/SM_Motel_TakeoutCup.glb" id="6_36gju"]
+[ext_resource type="PackedScene" path="res://models/SM_Motel_TrashBag.glb" id="7_tql22"]
+[ext_resource type="Script" path="res://orbit_camera.gd" id="8_jbdfk"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_4gl14"]
+size = Vector2(11.8, 11.8)
+
+[sub_resource type="Environment" id="Environment_5g7v7"]
+background_mode = 1
+background_color = Color(0.08, 0.08, 0.09, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.55, 0.55, 0.6, 1)
+
+[node name="Demo" type="Node3D" unique_id=1022379758]
+
+[node name="SM_Motel_BeerBottle" type="Node3D" parent="." unique_id=1235563215 instance=ExtResource("1_n4w22")]
+
+[node name="SM_Motel_CardboardBox" type="Node3D" parent="." unique_id=1475646521 instance=ExtResource("2_884kg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, 0)
+
+[node name="SM_Motel_CrushedCan" type="Node3D" parent="." unique_id=817647192 instance=ExtResource("3_d4o4o")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0, 0)
+
+[node name="SM_Motel_Newspaper" type="Node3D" parent="." unique_id=1615347968 instance=ExtResource("4_gdsc3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.6)
+
+[node name="SM_Motel_PizzaBox" type="Node3D" parent="." unique_id=1226694639 instance=ExtResource("5_svejp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 0, 2.6)
+
+[node name="SM_Motel_TakeoutCup" type="Node3D" parent="." unique_id=2038193919 instance=ExtResource("6_36gju")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2, 0, 2.6)
+
+[node name="SM_Motel_TrashBag" type="Node3D" parent="." unique_id=1042375761 instance=ExtResource("7_tql22")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.2)
+
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=2017404683]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, -0.001, 2.6)
+mesh = SubResource("PlaneMesh_4gl14")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1920700136]
+transform = Transform3D(0.81915206, -0.43938506, 0.36868784, 0, 0.64278764, 0.76604444, -0.57357645, -0.62750685, 0.5265408, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Environment" type="WorldEnvironment" parent="." unique_id=682386620]
+environment = SubResource("Environment_5g7v7")
+
+[node name="Camera" type="Camera3D" parent="." unique_id=369893466]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.6, 5.46, 9.62)
+script = ExtResource("8_jbdfk")

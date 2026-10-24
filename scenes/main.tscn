@@ -4,6 +4,11 @@
 [ext_resource type="PackedScene" uid="uid://bq5jcypbh5ou5" path="res://scenes/maze.tscn" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://b148g0518jem5" path="res://scenes/player.tscn" id="3_sugp2"]
 [ext_resource type="Script" uid="uid://bo2j7ndnjdept" path="res://scripts/look_zone.gd" id="4_lkzon"]
+[ext_resource type="PackedScene" uid="uid://g6wrwanv6m45" path="res://scenes/phee_tor.tscn" id="5_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://bdnvtwncoqy4m" path="res://scenes/can.tscn" id="6_cansn"]
+[ext_resource type="Script" uid="uid://dd6o6ey1qv1mn" path="res://scripts/can_spawner.gd" id="7_spawner"]
+[ext_resource type="PackedScene" uid="uid://dbstc1ph7eoh" path="res://scenes/mobile_ui.tscn" id="8_mobui"]
+[ext_resource type="Script" uid="uid://cjhfse7fr8c1p" path="res://scripts/box_spawner.gd" id="9_bxspn"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sugp2"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -77,3 +82,24 @@ offset_bottom = 40.0
 
 [node name="player" parent="." unique_id=1574290815 instance=ExtResource("3_sugp2")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 23.896854, 0, -2.4649858)
+
+[node name="PheeTor" parent="." unique_id=2135428142 instance=ExtResource("5_tbgi4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6220521, 0, 1.4902167)
+patrol_speed = 0.9
+damage = 1469
+
+[node name="PheeTor2" parent="." unique_id=1822727063 instance=ExtResource("5_tbgi4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.985181, 0, -2.9086957)
+patrol_speed = 0.9
+damage = 1469
+
+[node name="CanSpawner" type="Node3D" parent="." unique_id=1409065409]
+script = ExtResource("7_spawner")
+can_scene = ExtResource("6_cansn")
+map_min = Vector2(-38, -38)
+map_max = Vector2(38, 38)
+
+[node name="BoxSpawner" type="Node3D" parent="." unique_id=1409065410]
+script = ExtResource("9_bxspn")
+
+[node name="MobileUI" parent="." unique_id=1982318512 instance=ExtResource("8_mobui")]

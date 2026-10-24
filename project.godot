@@ -13,6 +13,7 @@ config_version=5
 config/name="mobile horror"
 run/main_scene="uid://dodoq13q33uxf"
 config/features=PackedStringArray("4.6", "Mobile")
+boot_splash/image="uid://bvcpqquq5mnno"
 config/icon="res://icon.svg"
 
 [autoload]

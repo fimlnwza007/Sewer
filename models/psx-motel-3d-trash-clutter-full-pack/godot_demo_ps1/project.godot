@@ -1,0 +1,9 @@
+config_version=5
+
+[application]
+config/name="PSX Motel 3D Trash and Clutter (ps1)"
+run/main_scene="res://demo.tscn"
+config/features=PackedStringArray("4.7")
+
+[rendering]
+textures/default_filters/use_nearest_mipmap_filter=true

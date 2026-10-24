@@ -1,0 +1,10 @@
+AssetsFactory Asset License v1.0
+Product: PSX Motel 3D Trash and Clutter (free)
+
+Summary: use these files in your own games and projects, commercial or not. Do not resell or redistribute the files themselves.
+
+1. You may use, modify and include these files in any number of your own projects (games, apps, videos, prototypes), commercial or non-commercial.
+2. You may distribute the files only as part of a finished project, in a form that end users cannot easily extract and reuse as assets.
+3. You may not sell, share, sublicense or give away the files, alone or in another asset pack, template or kit, even if modified.
+4. Credit is appreciated but not required.
+5. The files are provided as is, without warranty.

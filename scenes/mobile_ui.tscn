@@ -1,0 +1,190 @@
+[gd_scene format=3 uid="uid://dbstc1ph7eoh"]
+
+[ext_resource type="Script" uid="uid://d0xwkkji3irvp" path="res://scripts/mobile_ui.gd" id="1_mobui"]
+
+[node name="MobileUI" type="CanvasLayer" unique_id=2047810647]
+script = ExtResource("1_mobui")
+
+[node name="Control" type="Control" parent="." unique_id=973611097]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SquintOverlay" type="Control" parent="Control" unique_id=1498302187]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopBar" type="ColorRect" parent="Control/SquintOverlay" unique_id=1498302188]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.04, 0.04, 0.04, 1)
+
+[node name="BottomBar" type="ColorRect" parent="Control/SquintOverlay" unique_id=1498302189]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+color = Color(0.04, 0.04, 0.04, 1)
+
+[node name="SideLeft" type="ColorRect" parent="Control/SquintOverlay" unique_id=1498302190]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 65.0
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.02, 0.02, 0.8)
+
+[node name="SideRight" type="ColorRect" parent="Control/SquintOverlay" unique_id=1498302191]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -65.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.02, 0.02, 0.02, 0.8)
+
+[node name="ActionButton" type="Button" parent="Control" unique_id=1851322205 groups=["mobile_ui_button"]]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -213.0
+offset_top = -330.0
+offset_right = -93.0
+offset_bottom = -267.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(60, 31.5)
+theme_override_font_sizes/font_size = 20
+text = "เก็บ"
+
+[node name="CrouchButton" type="Button" parent="Control" unique_id=1851322206 groups=["mobile_ui_button"]]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -213.0
+offset_top = -250.0
+offset_right = -93.0
+offset_bottom = -187.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(60, 31.5)
+theme_override_font_sizes/font_size = 20
+text = "👟 ย่อง"
+
+[node name="HideButton" type="Button" parent="Control" unique_id=1851322207 groups=["mobile_ui_button"]]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -213.0
+offset_top = -410.0
+offset_right = -93.0
+offset_bottom = -347.0
+grow_horizontal = 0
+grow_vertical = 0
+pivot_offset = Vector2(60, 31.5)
+theme_override_font_sizes/font_size = 20
+text = "📦 ซ่อน"
+
+[node name="Crosshair" type="ColorRect" parent="Control" unique_id=1723525124]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -2.0
+offset_top = -2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(1, 1, 1, 0.4)
+
+[node name="GameOverPanel" type="Control" parent="Control" unique_id=1498302195]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="Control/GameOverPanel" unique_id=1498302196]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0, 0, 0.92)
+
+[node name="CenterBox" type="VBoxContainer" parent="Control/GameOverPanel" unique_id=1498302197]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -140.0
+offset_right = 220.0
+offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Control/GameOverPanel/CenterBox" unique_id=1498302198]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.12, 0.12, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 46
+text = "คุณตายแล้ว"
+horizontal_alignment = 1
+
+[node name="SubTitleLabel" type="Label" parent="Control/GameOverPanel/CenterBox" unique_id=1498302199]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 18
+text = "ผีผีท่อตามล่าคุณจนทัน..."
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="Control/GameOverPanel/CenterBox" unique_id=1498302200 groups=["mobile_ui_button"]]
+custom_minimum_size = Vector2(240, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "🔄 เริ่มเกมใหม่"

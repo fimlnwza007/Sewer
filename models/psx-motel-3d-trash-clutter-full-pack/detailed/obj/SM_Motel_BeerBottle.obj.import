@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bhn6kr215cxta"
+path="res://.godot/imported/SM_Motel_BeerBottle.obj-d29ab0ae0d2c714d7ede63ce00732841.mesh"
+
+[deps]
+
+files=["res://.godot/imported/SM_Motel_BeerBottle.obj-d29ab0ae0d2c714d7ede63ce00732841.mesh"]
+
+source_file="res://models/psx-motel-3d-trash-clutter-full-pack/detailed/obj/SM_Motel_BeerBottle.obj"
+dest_files=["res://.godot/imported/SM_Motel_BeerBottle.obj-d29ab0ae0d2c714d7ede63ce00732841.mesh", "res://.godot/imported/SM_Motel_BeerBottle.obj-d29ab0ae0d2c714d7ede63ce00732841.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
