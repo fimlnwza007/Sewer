@@ -19,6 +19,11 @@ config/icon="res://icon.svg"
 
 Auto="*uid://dfgmo3d4hlf3h"
 
+[display]
+
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
 [input]
 
 w={
