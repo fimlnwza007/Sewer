@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://c3pihn2ln04fx" path="res://scenes/controller.tscn" id="1_o5qli"]
 [ext_resource type="PackedScene" uid="uid://bq5jcypbh5ou5" path="res://scenes/maze.tscn" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://b148g0518jem5" path="res://scenes/player.tscn" id="3_sugp2"]
+[ext_resource type="Script" uid="uid://bo2j7ndnjdept" path="res://scripts/look_zone.gd" id="4_lkzon"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sugp2"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -58,6 +59,19 @@ action_right = &"d"
 action_up = &"w"
 action_down = &"s"
 
+[node name="LookZone" type="Control" parent="control panal" unique_id=-1447576275]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("4_lkzon")
+
+[node name="Control" type="Control" parent="control panal" unique_id=1785360666]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="Sewers" parent="." unique_id=1127065410 instance=ExtResource("2_0wfyh")]
 

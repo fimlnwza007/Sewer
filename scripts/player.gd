@@ -33,26 +33,24 @@ func _input(event: InputEvent) -> void:
 		_look_accum += event.relative
 		return
 
-	# ===== Touch look (right half of screen) =====
+	# ===== Touch look (right half of screen — x > 45% of viewport) =====
 	elif event is InputEventScreenTouch:
-		var vp_w: float = get_viewport().get_visible_rect().size.x
-		if event.pressed and _look_index == -1 and event.position.x >= vp_w * 0.45:
+		var vp: Vector2 = get_viewport().get_visible_rect().size
+		var in_look_zone: bool = event.position.x >= vp.x * 0.45
+		if event.pressed and _look_index == -1 and in_look_zone:
 			_look_index = event.index
 			_look_last  = event.position
 			_look_accum = Vector2.ZERO
-			get_viewport().set_input_as_handled()
 		elif not event.pressed and event.index == _look_index:
 			_look_index = -1
-			get_viewport().set_input_as_handled()
 
 	elif event is InputEventScreenDrag and event.index == _look_index:
-		# คำนวณ delta จาก position จริง (ไม่ใช้ event.relative ที่มีบั๊ก multi-touch)
+		# คำนวณ delta จาก position จริงของนิ้วนี้ (ไม่ใช้ event.relative ที่มีบั๊ก multi-touch)
 		var raw: Vector2 = event.position - _look_last
 		_look_last = event.position
-		# Spike guard: ตัดค่ากระโดดผิดปกติตอนวางนิ้วที่ 2
+		# Spike guard: ตัดค่าที่กระโดดผิดปกติ (เกิดตอนวางนิ้วที่ 2 ลง)
 		if raw.length() <= 80.0:
 			_look_accum += raw
-		get_viewport().set_input_as_handled()
 
 ## ===================== Process =====================
 func _process(_delta: float) -> void:
