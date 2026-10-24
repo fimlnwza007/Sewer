@@ -1,0 +1,81 @@
+[gd_scene format=3 uid="uid://dodoq13q33uxf"]
+
+[ext_resource type="PackedScene" uid="uid://c3pihn2ln04fx" path="res://scenes/controller.tscn" id="1_o5qli"]
+[ext_resource type="PackedScene" uid="uid://bq5jcypbh5ou5" path="res://scenes/maze.tscn" id="2_0wfyh"]
+[ext_resource type="PackedScene" uid="uid://b148g0518jem5" path="res://scenes/player.tscn" id="3_sugp2"]
+[ext_resource type="Script" uid="uid://bo2j7ndnjdept" path="res://scripts/look_zone.gd" id="4_lkzon"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sugp2"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+energy_multiplier = 0.0
+
+[sub_resource type="Sky" id="Sky_jyhfs"]
+sky_material = SubResource("ProceduralSkyMaterial_sugp2")
+
+[sub_resource type="Environment" id="Environment_tbgi4"]
+background_mode = 2
+sky = SubResource("Sky_jyhfs")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="main" type="Node3D" unique_id=2036072657]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=239690201]
+environment = SubResource("Environment_tbgi4")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1498079777]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+light_energy = 0.001
+shadow_enabled = true
+
+[node name="DirectionalLight3D2" type="DirectionalLight3D" parent="." unique_id=491370874]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+visible = false
+light_energy = 2.396
+shadow_enabled = true
+
+[node name="control panal" type="Control" parent="." unique_id=1383072450]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+
+[node name="Controller" parent="control panal" unique_id=1460339295 instance=ExtResource("1_o5qli")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_right = 0.0
+offset_left = 200.0
+offset_top = -148.0
+offset_right = 200.0
+offset_bottom = -148.0
+grow_horizontal = 1
+grow_vertical = 0
+mouse_filter = 2
+use_input_actions = true
+action_left = &"a"
+action_right = &"d"
+action_up = &"w"
+action_down = &"s"
+
+[node name="LookZone" type="Control" parent="control panal" unique_id=-1447576275]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+script = ExtResource("4_lkzon")
+player_path = NodePath("../../player")
+
+[node name="Control" type="Control" parent="control panal" unique_id=1785360666]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Sewers" parent="." unique_id=1127065410 instance=ExtResource("2_0wfyh")]
+
+[node name="player" parent="." unique_id=1574290815 instance=ExtResource("3_sugp2")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 23.896854, 0, -2.4649858)

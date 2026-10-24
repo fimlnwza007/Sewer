@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://c3pihn2ln04fx"]
+
+[ext_resource type="Script" uid="uid://c40n831p6o3j5" path="res://addons/touch_screen_joystick/touch_screen_joystick.gd" id="1_60fnl"]
+
+[node name="Controller" type="Control" unique_id=1460339295]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_60fnl")
