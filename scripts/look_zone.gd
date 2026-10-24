@@ -37,17 +37,6 @@ func _input(event: InputEvent) -> void:
 		_on_touch(event)
 	elif event is InputEventScreenDrag:
 		_on_drag(event)
-	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		if event.pressed and _touch_index == -1 and _is_in_zone(event.position):
-			_touch_index = 9999
-			get_viewport().set_input_as_handled()
-		elif not event.pressed and _touch_index == 9999:
-			_touch_index = -1
-			get_viewport().set_input_as_handled()
-	elif event is InputEventMouseMotion:
-		if _touch_index == 9999 and _player:
-			_player.apply_look_delta(event.relative * look_sensitivity)
-			get_viewport().set_input_as_handled()
 
 func _on_touch(event: InputEventScreenTouch) -> void:
 	if event.pressed and _touch_index == -1:
