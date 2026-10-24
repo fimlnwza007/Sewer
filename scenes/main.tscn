@@ -35,12 +35,7 @@ visible = false
 light_energy = 2.396
 shadow_enabled = true
 
-[node name="control panal" type="Control" parent="." unique_id=1383072450]
-layout_mode = 3
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-grow_vertical = 0
+[node name="control panal" type="CanvasLayer" parent="." unique_id=1383072450]
 
 [node name="Controller" parent="control panal" unique_id=1460339295 instance=ExtResource("1_o5qli")]
 layout_mode = 1
@@ -68,11 +63,6 @@ grow_horizontal = 0
 grow_vertical = 2
 script = ExtResource("4_lkzon")
 player_path = NodePath("../../player")
-
-[node name="Control" type="Control" parent="control panal" unique_id=1785360666]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
 
 [node name="Sewers" parent="." unique_id=1127065410 instance=ExtResource("2_0wfyh")]
 
