@@ -1,6 +1,27 @@
 [gd_scene format=3 uid="uid://dbstc1ph7eoh"]
 
 [ext_resource type="Script" uid="uid://d0xwkkji3irvp" path="res://scripts/mobile_ui.gd" id="1_mobui"]
+[ext_resource type="Texture2D" uid="uid://bp5bs88f7l2ti" path="res://addons/at-icons/node/hand.svg" id="2_k5yl4"]
+[ext_resource type="Texture2D" uid="uid://b6irwrj1ihi24" path="res://addons/at-icons/node/arrow_down_to_line.svg" id="3_ll7hi"]
+[ext_resource type="Texture2D" uid="uid://bt12y6jr8g4r6" path="res://addons/at-icons/node/eye.svg" id="4_uqj2s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_normal"]
+bg_color = Color(0.2, 0.2, 0.2, 0.6)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 36
+corner_radius_bottom_left = 36
+corner_detail = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn_pressed"]
+bg_color = Color(0.12, 0.12, 0.12, 0.85)
+corner_radius_top_left = 36
+corner_radius_top_right = 36
+corner_radius_bottom_right = 36
+corner_radius_bottom_left = 36
+corner_detail = 16
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_btn_focus"]
 
 [node name="MobileUI" type="CanvasLayer" unique_id=2047810647]
 script = ExtResource("1_mobui")
@@ -71,15 +92,20 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -213.0
-offset_top = -330.0
-offset_right = -93.0
-offset_bottom = -267.0
+offset_left = -140.0
+offset_top = -275.0
+offset_right = -68.0
+offset_bottom = -203.0
 grow_horizontal = 0
 grow_vertical = 0
-pivot_offset = Vector2(60, 31.5)
-theme_override_font_sizes/font_size = 20
-text = "เก็บ"
+pivot_offset = Vector2(36, 36)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_btn_focus")
+icon = ExtResource("2_k5yl4")
+icon_alignment = 1
 
 [node name="CrouchButton" type="Button" parent="Control" unique_id=1851322206 groups=["mobile_ui_button"]]
 layout_mode = 1
@@ -88,15 +114,20 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -213.0
-offset_top = -250.0
-offset_right = -93.0
-offset_bottom = -187.0
+offset_left = -140.0
+offset_top = -180.0
+offset_right = -68.0
+offset_bottom = -108.0
 grow_horizontal = 0
 grow_vertical = 0
-pivot_offset = Vector2(60, 31.5)
-theme_override_font_sizes/font_size = 20
-text = "👟 ย่อง"
+pivot_offset = Vector2(36, 36)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_btn_focus")
+icon = ExtResource("3_ll7hi")
+icon_alignment = 1
 
 [node name="HideButton" type="Button" parent="Control" unique_id=1851322207 groups=["mobile_ui_button"]]
 layout_mode = 1
@@ -105,15 +136,20 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -213.0
-offset_top = -410.0
-offset_right = -93.0
-offset_bottom = -347.0
+offset_left = -140.0
+offset_top = -370.0
+offset_right = -68.0
+offset_bottom = -298.0
 grow_horizontal = 0
 grow_vertical = 0
-pivot_offset = Vector2(60, 31.5)
-theme_override_font_sizes/font_size = 20
-text = "📦 ซ่อน"
+pivot_offset = Vector2(36, 36)
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_btn_pressed")
+theme_override_styles/hover = SubResource("StyleBoxFlat_btn_normal")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_btn_focus")
+icon = ExtResource("4_uqj2s")
+icon_alignment = 1
 
 [node name="Crosshair" type="ColorRect" parent="Control" unique_id=1723525124]
 layout_mode = 1
@@ -131,7 +167,7 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0.4)
 
-[node name="GameOverPanel" type="Control" parent="Control" unique_id=1498302195]
+[node name="GameOverScreen" type="Control" parent="Control" unique_id=1498302192]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -140,16 +176,16 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Background" type="ColorRect" parent="Control/GameOverPanel" unique_id=1498302196]
+[node name="Background" type="ColorRect" parent="Control/GameOverScreen" unique_id=1498302193]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.08, 0, 0, 0.92)
+color = Color(0.08, 0, 0, 0.85)
 
-[node name="CenterBox" type="VBoxContainer" parent="Control/GameOverPanel" unique_id=1498302197]
+[node name="VBox" type="VBoxContainer" parent="Control/GameOverScreen" unique_id=1498302194]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -157,34 +193,88 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -220.0
-offset_top = -140.0
+offset_top = -130.0
 offset_right = 220.0
-offset_bottom = 140.0
+offset_bottom = 130.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 22
+theme_override_constants/separation = 18
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="Control/GameOverPanel/CenterBox" unique_id=1498302198]
+[node name="Title" type="Label" parent="Control/GameOverScreen/VBox" unique_id=1498302195]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.92, 0.12, 0.12, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 3
-theme_override_constants/shadow_offset_y = 3
+theme_override_colors/font_color = Color(0.95, 0.15, 0.15, 1)
 theme_override_font_sizes/font_size = 46
 text = "คุณตายแล้ว"
 horizontal_alignment = 1
 
-[node name="SubTitleLabel" type="Label" parent="Control/GameOverPanel/CenterBox" unique_id=1498302199]
+[node name="Subtitle" type="Label" parent="Control/GameOverScreen/VBox" unique_id=1498302196]
+visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 0.85)
 theme_override_font_sizes/font_size = 18
-text = "ผีผีท่อตามล่าคุณจนทัน..."
+text = "ผีท่อสังหารคุณในความมืด"
 horizontal_alignment = 1
 
-[node name="RestartButton" type="Button" parent="Control/GameOverPanel/CenterBox" unique_id=1498302200 groups=["mobile_ui_button"]]
-custom_minimum_size = Vector2(240, 64)
+[node name="RestartButton" type="Button" parent="Control/GameOverScreen/VBox" unique_id=1498302197 groups=["mobile_ui_button"]]
+custom_minimum_size = Vector2(220, 56)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 24
-text = "🔄 เริ่มเกมใหม่"
+theme_override_font_sizes/font_size = 22
+text = "เริ่มเกมใหม่"
+
+[node name="WinScreen" type="Control" parent="Control" unique_id=1498302210]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="Control/WinScreen" unique_id=1498302211]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.08, 0.02, 0.88)
+
+[node name="VBox" type="VBoxContainer" parent="Control/WinScreen" unique_id=1498302212]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -150.0
+offset_right = 240.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Title" type="Label" parent="Control/WinScreen/VBox" unique_id=1498302213]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.45, 1)
+theme_override_font_sizes/font_size = 52
+text = "คุณรอดแล้ว"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Control/WinScreen/VBox" unique_id=1498302214]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.95, 0.8, 0.9)
+theme_override_font_sizes/font_size = 19
+text = "คุณหนีออกจากท่อระบายน้ำได้สำเร็จ"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="Control/WinScreen/VBox" unique_id=1498302215 groups=["mobile_ui_button"]]
+custom_minimum_size = Vector2(220, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "เล่นอีกครั้ง"

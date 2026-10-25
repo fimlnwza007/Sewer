@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://dd6o6ey1qv1mn" path="res://scripts/can_spawner.gd" id="7_spawner"]
 [ext_resource type="PackedScene" uid="uid://dbstc1ph7eoh" path="res://scenes/mobile_ui.tscn" id="8_mobui"]
 [ext_resource type="Script" uid="uid://cjhfse7fr8c1p" path="res://scripts/box_spawner.gd" id="9_bxspn"]
+[ext_resource type="PackedScene" uid="uid://cw5aql2f44302" path="res://scenes/exit.tscn" id="10_exit"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sugp2"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -103,3 +104,6 @@ map_max = Vector2(38, 38)
 script = ExtResource("9_bxspn")
 
 [node name="MobileUI" parent="." unique_id=1982318512 instance=ExtResource("8_mobui")]
+
+[node name="Exit" parent="." unique_id=1982318513 instance=ExtResource("10_exit")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -24.500296, 0.16388118, 1.5601494)

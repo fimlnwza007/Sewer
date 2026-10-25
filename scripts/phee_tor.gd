@@ -25,12 +25,12 @@ extends CharacterBody3D
 
 ## ===================== AI Exports =====================
 @export_group("Detection")
-## ให้ผีมองเห็นผู้เล่นหรือไม่ (false = ตาบอด ตรวจจับด้วยเสียงเท่านั้น)
-@export var can_see_player:   bool  = false
+## ให้ผีมองเห็นผู้เล่นหรือไม่ (true = มองเห็นตามระยะและ FOV)
+@export var can_see_player:   bool  = true
 ## ระยะที่ผีมองเห็น (มีผลเมื่อ can_see_player = true)
 @export var sight_range:      float = 18.0
 ## มุมมอง FOV
-@export var fov_degrees:      float = 110.0
+@export var fov_degrees:      float = 120.0
 ## ระยะได้ยินเสียงเท้า player ขณะเดิน
 @export var sound_range:      float = 4.0
 ## ระยะได้ยินเสียงเท้าขณะวิ่ง (ไกลกว่า)
@@ -39,10 +39,10 @@ extends CharacterBody3D
 @export var lose_range:       float = 28.0
 @export_group("Movement")
 @export var patrol_speed:    float = 2.5
-@export var chase_speed:     float = 5.5
-@export var attack_range:    float = 1.5
-@export var attack_cooldown: float = 2.0
-@export var damage:          int   = 40
+@export var chase_speed:     float = 5.6
+@export var attack_range:    float = 2.6
+@export var attack_cooldown: float = 0.3
+@export var damage:          int   = 9999
 @export_group("Wander")
 ## เดินไปทิศหนึ่งกี่วินาทีก่อนเปลี่ยน
 @export var wander_duration: float = 6.0
@@ -63,14 +63,18 @@ var _audio_oneshot: AudioStreamPlayer3D = null
 var _player: CharacterBody3D = null
 
 ## ===================== Internal =====================
-var _attack_timer:   float   = 0.0
-var _wander_timer:   float   = 0.0
-var _move_dir:       Vector3 = Vector3.ZERO
-var _last_known_pos: Vector3 = Vector3.ZERO  ## ตำแหน่งล่าสุดที่รู้ว่า player อยู่
-var _has_last_known: bool    = false
-var _can_see_player: bool    = false
-var _can_hear_player: bool   = false
-var _scream_timer:   float   = 0.0
+var _attack_timer:         float   = 0.0
+var _attack_has_hit:       bool    = false
+var _attack_duration:      float   = 0.0
+var _chase_persist_timer:  float   = 0.0
+var _scream_cooldown:      float   = 0.0
+var _wander_timer:         float   = 0.0
+var _move_dir:             Vector3 = Vector3.ZERO
+var _last_known_pos:       Vector3 = Vector3.ZERO  ## ตำแหน่งล่าสุดที่รู้ว่า player อยู่
+var _has_last_known:       bool    = false
+var _can_see_player:       bool    = false
+var _can_hear_player:      bool    = false
+var _scream_timer:         float   = 0.0
 var _gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _base_loop_volume: float = 4.0
 var _base_oneshot_volume: float = 6.0
@@ -119,20 +123,37 @@ func _ready() -> void:
 
 ## ===================== Physics =====================
 func _physics_process(delta: float) -> void:
+	
 	if not is_on_floor():
 		velocity.y -= _gravity * delta
 
 	_attack_timer -= delta
 	_wander_timer -= delta
+	_scream_cooldown -= delta
+
+	# ถ้า player ตายแล้ว ให้ผียืนอยู่เฉยๆ ไม่ต้องไล่ต่อ
+	if _player and _player.get("is_dead"):
+		if _state != State.IDLE:
+			_set_state(State.IDLE)
+		_tick_idle()
+		move_and_slide()
+		return
 
 	# อัปเดตการรับรู้ player ทุก frame
 	_update_senses()
 	_update_audio_occlusion()
 
-	# ถ้า detect player ได้ขณะ PATROL/IDLE/INVESTIGATE → SCREAM แล้วไล่
+	# ถ้า detect player ได้ขณะ PATROL/IDLE/INVESTIGATE
 	if (_can_see_player or _can_hear_player) and \
 	   _state in [State.IDLE, State.PATROL, State.INVESTIGATE]:
-		_set_state(State.SCREAM)
+		var p_dist := global_position.distance_to(_player.global_position)
+		if p_dist <= attack_range:
+			_set_state(State.ATTACK)
+		elif p_dist <= 5.0 or _scream_cooldown > 0.0:
+			# อยู่ใกล้ (< 5.0m) หรือเพิ่งกรีดร้องไป ไม่ต้องยืนกรีดร้องค้าง ให้พุ่งไล่ทันที!
+			_set_state(State.CHASE)
+		else:
+			_set_state(State.SCREAM)
 
 	match _state:
 		State.IDLE:        _tick_idle()
@@ -141,17 +162,28 @@ func _physics_process(delta: float) -> void:
 		State.CHASE:       _tick_chase()
 		State.SCREAM:
 			_scream_timer -= delta
-			if _scream_timer <= 0.0 or (_anim and not _anim.is_playing()):
+			if _player:
+				var to_p := (_player.global_position - global_position)
+				to_p.y = 0.0
+				if to_p.length() > 0.1:
+					look_at(global_position - to_p.normalized(), Vector3.UP)
+			var p_dist := global_position.distance_to(_player.global_position) if _player else 999.0
+			# ถ้าผู้เล่นเข้ามาในระยะโจมตีตอนกำลังกรีดร้อง ให้ฟันทันที
+			if p_dist <= attack_range and not (_player.has_method("is_hidden") and _player.is_hidden()):
+				_set_state(State.ATTACK)
+			elif _scream_timer <= 0.0 or (_anim and not _anim.is_playing()):
 				_set_state(State.CHASE)
 		State.ATTACK:
 			_tick_attack()
-			# animation จบ → ถ้ายังได้ยินเสียง หรืออยู่ใกล้มาก (ระยะโจมตี) ให้ไล่ต่อ ไม่งั้นกลับไป IDLE/PATROL
-			if _anim and not _anim.is_playing():
+			# เมื่อฟันเสร็จแล้ว (ระยะเวลา 0.45s หรือ animation จบ)
+			if _attack_duration <= 0.0 or (_anim and not _anim.is_playing()):
 				var dist := global_position.distance_to(_player.global_position) if _player else 999.0
-				if _can_see_player or _can_hear_player or dist <= attack_range * 1.5:
-					_set_state(State.CHASE)
-				elif _has_last_known:
-					_set_state(State.INVESTIGATE)
+				var is_player_hidden: bool = _player and _player.has_method("is_hidden") and _player.is_hidden()
+				if not is_player_hidden and not _player.get("is_dead"):
+					if dist <= attack_range and _attack_timer <= 0.0:
+						_set_state(State.ATTACK)
+					else:
+						_set_state(State.CHASE)
 				else:
 					_set_state(State.IDLE)
 		State.WALL_SLAM:
@@ -167,8 +199,8 @@ func _update_senses() -> void:
 		_can_hear_player = false
 		return
 
-	# ถ้า player ตายแล้ว หรือซ่อนตัวอยู่ในกล่อง ผีจะมองไม่เห็นและไม่ได้ยิน
-	if _player.get("is_dead") or (_player.has_method("is_hidden") and _player.is_hidden()):
+	# ถ้า player ซ่อนตัวอยู่ในกล่อง ผีจะมองไม่เห็นและไม่ได้ยินอย่างสิ้นเชิง
+	if _player.has_method("is_hidden") and _player.is_hidden():
 		_can_see_player  = false
 		_can_hear_player = false
 		return
@@ -206,18 +238,21 @@ func _update_senses() -> void:
 
 func _check_sight(dist: float) -> bool:
 	if dist > sight_range: return false
+	# ถ้าอยู่ใกล้มาก (< 3.0 ม.) มองเห็นรอบทิศทันทีหากไม่มีกำแพงกั้น
+	if dist <= 3.0:
+		return not _is_sound_blocked_by_wall(global_position, _player.global_position)
+
+	# ถ้ากำลังไล่ล่าอยู่ (CHASE) ในระยะ 12.0 ม. จะล็อกเป้าต่อเนื่อง ไม่หลุดสายตาง่ายๆ ถ้าไม่มีกำแพงกั้น
+	if _state == State.CHASE and dist <= 12.0:
+		return not _is_sound_blocked_by_wall(global_position, _player.global_position)
+
 	var to_player := (_player.global_position - global_position).normalized()
-	var forward   := -global_transform.basis.z
-	var angle     := rad_to_deg(forward.angle_to(to_player))
+	# ตัว model หันไปทาง +Z (ตาม _face_velocity)
+	var forward := global_transform.basis.z
+	var angle := rad_to_deg(forward.angle_to(to_player))
 	if angle > fov_degrees * 0.5: return false
-	var space  := get_world_3d().direct_space_state
-	var query  := PhysicsRayQueryParameters3D.create(
-		global_position + Vector3(0, 0.8, 0),
-		_player.global_position + Vector3(0, 0.8, 0),
-		collision_mask, [self]
-	)
-	var result := space.intersect_ray(query)
-	return result.is_empty() or result.get("collider") == _player
+
+	return not _is_sound_blocked_by_wall(global_position, _player.global_position)
 
 ## ===================== State Ticks =====================
 func _tick_idle() -> void:
@@ -283,29 +318,31 @@ func _tick_investigate() -> void:
 	_face_velocity()
 
 func _tick_chase() -> void:
-	if _player == null or _player.get("is_dead"):
-		_set_state(State.IDLE)
+	if _player == null:
+		_set_state(State.PATROL)
 		return
 
 	var dist := global_position.distance_to(_player.global_position)
 
-	# โจมตี (โจมตีไม่ได้ถ้า player ซ่อนตัวอยู่ในกล่อง)
+	# โจมตีทันทีถ้าถึงระยะ (โจมตีไม่ได้ถ้า player ซ่อนตัวอยู่ในกล่อง)
 	var is_player_hidden: bool = _player.has_method("is_hidden") and _player.is_hidden()
 	if not is_player_hidden and dist <= attack_range and _attack_timer <= 0.0:
 		_set_state(State.ATTACK)
 		return
 
-	# เสียตำแหน่ง / ผู้เล่นหยุดนิ่งเงียบเสียง หรือ แอบในกล่อง
-	if not _can_see_player and not _can_hear_player:
-		if dist > lose_range:
-			_has_last_known = false
-			_set_state(State.PATROL)
-			return
-		# ถ้าวิ่งมาถึงจุดที่ได้ยินเสียงล่าสุดแล้วแต่ไม่ได้ยินเสียงต่อ (หรือผู้เล่นแอบเข้ากล่อง) → หยุดฟัง/ตรวจรอบๆ แล้วเดินต่อ
-		var dist_to_last := global_position.distance_to(_last_known_pos)
-		if dist_to_last < 1.8:
-			_has_last_known = false
-			_set_state(State.IDLE)
+	# จัดการการคงสถานะการไล่ล่า (Chase persistence) ไม่ให้หยุดชะงักกลางคัน
+	var delta := get_physics_process_delta_time()
+	if _can_see_player or _can_hear_player:
+		_chase_persist_timer = 3.0
+		_last_known_pos = _player.global_position
+		_has_last_known = true
+	else:
+		_chase_persist_timer -= delta
+		if is_player_hidden or dist > lose_range or _chase_persist_timer <= 0.0:
+			if _has_last_known:
+				_set_state(State.INVESTIGATE)
+			else:
+				_set_state(State.PATROL)
 			return
 
 	# ไล่ตรงๆ — ถ้าเห็นหรือได้ยิน ใช้ตำแหน่งจริง / ถ้าไม่เห็นใช้ last_known_pos
@@ -315,18 +352,20 @@ func _tick_chase() -> void:
 	desired.y = 0.0
 	desired = desired.normalized()
 
-	var delta := get_physics_process_delta_time()
 	var dir := desired
 
-	# ถ้าอยู่ในช่วง dodge หลบมุมอับ
-	if _stuck_dodge_timer > 0.0:
+	# เมื่อเข้าใกล้ผู้เล่น (< 4.0 ม.) มุ่งตรงเข้าหาเลย ไม่ต้องเลี้ยวหลบหรือสะบัดหนี และหันหน้าเข้าหาผู้เล่นตรงๆ
+	if dist <= 4.0:
+		dir = desired
+		_stuck_dodge_timer = 0.0
+		if desired.length() > 0.01:
+			look_at(global_position - desired, Vector3.UP)
+	elif _stuck_dodge_timer > 0.0:
 		_stuck_dodge_timer -= delta
 		dir = _stuck_dodge_dir
+		_face_velocity()
 	else:
-		# หาทิศที่ไม่ชนกำแพง (ลองหลายมุม)
 		dir = _steer_around_wall(desired)
-
-		# ถ้าเดินชนกำแพงอยู่ ให้ slide ตามแนวผนัง
 		if is_on_wall():
 			var n := get_wall_normal()
 			var slide_dir := desired.slide(n)
@@ -334,26 +373,47 @@ func _tick_chase() -> void:
 			if slide_dir.length() > 0.1:
 				dir = slide_dir.normalized()
 
-		# Stuck detection — เช็คว่าติดมุม/กำแพงหรือไม่
 		_stuck_timer -= delta
 		if _stuck_timer <= 0.0:
 			if global_position.distance_to(_last_pos) < STUCK_DIST_THRESHOLD:
-				# ขยับน้อยมากใน 0.5 วินาที → เลี้ยวหลบ 60°-120° เดินค้างไว้ 0.6 วินาที
 				var turn_angle := deg_to_rad(randf_range(60.0, 120.0)) * (1.0 if randf() > 0.5 else -1.0)
 				_stuck_dodge_dir = _steer_around_wall(desired.rotated(Vector3.UP, turn_angle))
-				_stuck_dodge_timer = 0.6
+				_stuck_dodge_timer = 0.5
 				dir = _stuck_dodge_dir
 			_last_pos = global_position
 			_stuck_timer = STUCK_CHECK_INTERVAL
+		_face_velocity()
 
 	velocity.x = dir.x * chase_speed
 	velocity.z = dir.z * chase_speed
 	_move_dir = dir
-	_face_velocity()
 
 func _tick_attack() -> void:
-	velocity.x = 0.0
-	velocity.z = 0.0
+	var delta := get_physics_process_delta_time()
+	_attack_duration -= delta
+
+	if _player and not (_player.has_method("is_hidden") and _player.is_hidden()):
+		var to_p := (_player.global_position - global_position)
+		to_p.y = 0.0
+		var p_dist := to_p.length()
+		if p_dist > 0.05:
+			look_at(global_position - to_p.normalized(), Vector3.UP)
+
+		# พุ่งตัวชาร์จเข้าใส่ผู้เล่นเต็มแรง (Lunge forward) เพื่อไม่ให้ผู้เล่นถอยหลังหนีได้
+		if p_dist > 0.6:
+			velocity.x = to_p.normalized().x * (chase_speed * 1.05)
+			velocity.z = to_p.normalized().z * (chase_speed * 1.05)
+		else:
+			velocity.x = 0.0
+			velocity.z = 0.0
+
+		# เช็คการโจมตีโดนทันที ไม่รอ timer!
+		if not _attack_has_hit and p_dist <= attack_range * 1.4:
+			_deal_damage()
+			_attack_has_hit = true
+	else:
+		velocity.x = 0.0
+		velocity.z = 0.0
 
 ## ===================== Transition =====================
 func _set_state(new_state: State) -> void:
@@ -373,20 +433,36 @@ func _set_state(new_state: State) -> void:
 			_last_pos = global_position
 			_stuck_timer = STUCK_CHECK_INTERVAL
 			_stuck_dodge_timer = 0.0
+			_chase_persist_timer = 3.0
 			_play_anim_loop(ANIM_RUN)
 			_play_loop(sfx_chase)
 		State.ATTACK:
 			_attack_timer = attack_cooldown
+			_attack_has_hit = false
+			_attack_duration = 0.45
 			_play_anim(ANIM_ATTACK)
 			_play_oneshot(sfx_attack)
-			get_tree().create_timer(0.4).timeout.connect(_deal_damage)
+			if _player:
+				var to_p := (_player.global_position - global_position)
+				to_p.y = 0.0
+				if to_p.length() > 0.05:
+					look_at(global_position - to_p.normalized(), Vector3.UP)
+				if to_p.length() <= attack_range * 1.4:
+					_deal_damage()
+					_attack_has_hit = true
 		State.SCREAM:
-			_scream_timer = 1.0
+			_scream_timer = 0.35
+			_scream_cooldown = 7.0
 			velocity.x = 0.0
 			velocity.z = 0.0
 			_play_anim(ANIM_SCREAM)
 			_play_oneshot(sfx_detect)
 			_play_oneshot(sfx_scream)
+			if _player:
+				var to_p := (_player.global_position - global_position)
+				to_p.y = 0.0
+				if to_p.length() > 0.05:
+					look_at(global_position - to_p.normalized(), Vector3.UP)
 		State.WALL_SLAM:
 			velocity.x = 0.0
 			velocity.z = 0.0
@@ -405,10 +481,11 @@ func _on_animation_finished(anim_name: String) -> void:
 		State.ATTACK:
 			var dist := global_position.distance_to(_player.global_position) if _player else 999.0
 			var is_player_hidden: bool = _player and _player.has_method("is_hidden") and _player.is_hidden()
-			if not is_player_hidden and (_can_see_player or _can_hear_player or dist <= attack_range * 1.5):
-				_set_state(State.CHASE)
-			elif _has_last_known:
-				_set_state(State.INVESTIGATE)
+			if not is_player_hidden and not _player.get("is_dead"):
+				if dist <= attack_range and _attack_timer <= 0.0:
+					_set_state(State.ATTACK)
+				else:
+					_set_state(State.CHASE)
 			else:
 				_set_state(State.IDLE)
 		State.WALL_SLAM:
@@ -561,7 +638,7 @@ func _play_oneshot(stream: AudioStream) -> void:
 func _deal_damage() -> void:
 	if _player == null: return
 	if _player.has_method("is_hidden") and _player.is_hidden(): return
-	if global_position.distance_to(_player.global_position) > attack_range * 1.5: return
+	if _player.get("is_dead"): return
 	if _player.has_method("take_damage"):
 		_player.take_damage(damage)
 
@@ -609,11 +686,11 @@ func _is_sound_blocked_by_wall(from_pos: Vector3, to_pos: Vector3) -> bool:
 		return false
 	if _player != null and col == _player:
 		return false
-	# กระป๋องหรือกล่องไม่ใช่กำแพงท่อระบายน้ำ
-	if col.is_in_group("can") or col.is_in_group("hiding_box"):
+	# ผีตัวอื่น กระป๋อง หรือกล่อง ไม่ใช่กำแพงท่อระบายน้ำ
+	if col.is_in_group("phee_tor") or col.is_in_group("can") or col.is_in_group("hiding_box"):
 		return false
 	var parent: Node = col.get_parent()
-	if parent and (parent.is_in_group("can") or parent.is_in_group("hiding_box")):
+	if parent and (parent.is_in_group("phee_tor") or parent.is_in_group("can") or parent.is_in_group("hiding_box")):
 		return false
 	return true
 

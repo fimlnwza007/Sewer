@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://cw5aql2f44302"]
+
+[ext_resource type="Script" uid="uid://c73ixks60hrg7" path="res://scripts/exit_zone.gd" id="1_exit"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_exit"]
+size = Vector3(3, 3.5, 3)
+
+[sub_resource type="BoxMesh" id="BoxMesh_38eme"]
+size = Vector3(2.8, 3.2, 0.18)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_exit"]
+transparency = 1
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 3.5
+
+[node name="exit" type="Area3D" unique_id=196393169 groups=["exit_zone"]]
+monitorable = false
+script = ExtResource("1_exit")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=196393170]
+shape = SubResource("BoxShape3D_exit")
+
+[node name="GlowMesh" type="MeshInstance3D" parent="." unique_id=196393171]
+mesh = SubResource("BoxMesh_38eme")
+surface_material_override/0 = SubResource("StandardMaterial3D_exit")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=196393172]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+light_energy = 2.5
+omni_range = 8.0

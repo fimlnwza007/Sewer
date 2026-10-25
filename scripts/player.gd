@@ -19,7 +19,7 @@ var _current_box: Node = null
 var _pre_hide_pos: Vector3 = Vector3.ZERO
 var _original_fov: float = 75.0
 
-## ===================== Health & Death =====================
+## ===================== Health & Death (1-Hit Kill) =====================
 signal player_died
 var is_dead: bool = false
 
@@ -103,7 +103,10 @@ func _ensure_input_actions() -> void:
 
 ## ===================== Input =====================
 func _input(event: InputEvent) -> void:
+	# ถ้าตายแล้ว กดปุ่มอะไรให้เริ่มเกมใหม่ได้
 	if is_dead:
+		if event.is_action_pressed("ui_accept") or (event is InputEventKey and event.pressed and event.keycode == KEY_R):
+			get_tree().reload_current_scene()
 		return
 
 	# ESC toggle mouse lock (PC)
@@ -188,6 +191,7 @@ func _apply_look(delta: Vector2) -> void:
 
 ## ===================== Physics =====================
 func _physics_process(delta: float) -> void:
+	# ถ้าตายแล้ว หยุดอยู่กับที่
 	if is_dead:
 		velocity = Vector3.ZERO
 		return
@@ -234,23 +238,20 @@ func _physics_process(delta: float) -> void:
 	else:
 		_step_timer = 0.0
 
-## ===================== Damage & Death API =====================
-## โดนผีโจมตีทีเดียวตาย (One-hit kill)
-func take_damage(_amount: int = 1) -> void:
+## ===================== Damage & Death (1-Hit Kill) =====================
+func take_damage(_amount: int = 100) -> void:
 	if is_dead or _is_hidden:
 		return
 	is_dead = true
 	velocity = Vector3.ZERO
 
-	# ปลดล็อคเมาส์ให้เป็นอิสระเพื่อกดเริ่มเกมใหม่
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
-	# แอนิเมชันกล้องตอนตาย: ล้มฟุบลงกับพื้นและเอียงข้าง
-	var cam := head.get_node_or_null("Camera3D") as Camera3D
+	# แอนิเมชันล้มลงกับพื้น (ตายใน 1 ที)
 	var tw := create_tween().set_parallel(true)
-	tw.tween_property(head, "position:y", 0.15, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	if cam:
-		tw.tween_property(cam, "rotation:z", deg_to_rad(-45.0), 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(head, "position:y", 0.08, 0.45).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tw.tween_property(head, "rotation:z", deg_to_rad(-30.0), 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+
+	# ปล่อยเมาส์ให้สามารถกดปุ่มเริ่มเกมใหม่ได้
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 	player_died.emit()
 
